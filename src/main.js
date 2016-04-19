@@ -20,9 +20,11 @@ var fs = require('fs');
 var Train = require('./train');
 var Brain = require('./brain');
 var Ears = require('./ears');
+var Schedule = require('./schedule');
 
 // Create a new coverageBot
 var coverageBot = {
+  Schedule: new Schedule(),
   Brain: new Brain(),
   Ears: new Ears(process.env.SLACK_TOKEN)
 };
@@ -155,11 +157,16 @@ coverageBot.Ears.listen().hear('TRAINING TIME!!!', function(bot, message) {
 
     // Because we have at least a valid count of arguments, cache them into
     // variables for later use
-    var coverageAction = messageSplitBySpaces[1];
     var coveragePlace = messageSplitBySpaces[2];
     var coverageDate = messageSplitBySpaces[3];
     var coverageTimeStart = messageSplitBySpaces[4];
     var coverageTimeEnd = messageSplitBySpaces[5];
+
+    var isCoverageRequest = messageSplitBySpaces[1].startsWith("req");
+    if (isCoverageRequest) {
+      coverageBot.Schedule.requestCoverage(message.user, coveragePlace, coverageDate,
+          coverageTimeStart, coverageTimeEnd);
+    }
   }
 });
 
