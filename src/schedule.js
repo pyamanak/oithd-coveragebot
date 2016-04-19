@@ -15,7 +15,8 @@ var fs = require('fs');
 
 // This is where we will store the schedule
 // TODO sqlite or some other storage DB
-var SCHEDULE_LOCATION = __dirname + '/../sched/schedule.json';
+var SCHEDULE_DIR = __dirname + '/../sched';
+var SCHEDULE_LOCATION = SCHEDULE_DIR + '/schedule.json';
 
 // Export the module name
 module.exports = Schedule;
@@ -26,10 +27,52 @@ module.exports = Schedule;
 function Schedule() {}
 
 /**
+  SCHEDULE
+
+  {
+   "request" :
+   [
+      {
+        "user" : <user_id>,
+        "place" : <place>,
+        "date" : <date>,
+        "start" : <start_time>,
+        "end" : <end_time>
+      }
+   ]
+   "provide" :
+   [
+      {
+        "user" : <user_id>,
+        "who" : <who_user_id>,
+        "place" : <place>,
+        "date" : <date>,
+        "start" : <start_time>,
+        "end" : <end_time>
+      }
+   ]
+
+  }
+
+  "request" will hold an array of coverage requests.
+  Each request will have the user who requested as well as a location to cover,
+  date of coverage, and time frame
+
+  "provide" will hold an array of coverage provides.
+  Each provide will have the user who is providing, the user they are providing
+  for, the place, date, and time frame
+
+
+  */
+
+/**
 * Request coverage for a given user at a place, date, time
 */
 Schedule.prototype.requestCoverage = function(user, place, date, start, end) {
   console.log("About to update schedule...");
+
+  // Make dir if it does not exist
+  fs.mkdirSync(SCHEDULE_DIR);
 
   // Touch the file
   fs.closeSync(fs.openSync(SCHEDULE_LOCATION, 'a'));
